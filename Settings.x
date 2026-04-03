@@ -335,6 +335,41 @@ static NSString *GetCacheSize() {
 
         [sectionItems addObject:other];
 
+        // ──────────────────────────────────────────
+        // Plus Features (new modules from v4.0)
+        // ──────────────────────────────────────────
+        YTSettingsSectionItem *plusFeatures = [YTSettingsSectionItemClass itemWithTitle:LOC(@"PlusFeatures")
+        accessibilityIdentifier:@"YTLiteSectionItem"
+        detailTextBlock:^NSString *() {
+            return @"‣";
+        }
+        selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
+            NSMutableArray <YTSettingsSectionItem *> *rows = [NSMutableArray array];
+
+#ifdef ENABLE_SLEEP_TIMER
+            [rows addObject:[self switchWithTitle:@"SleepTimer" key:@"sleepTimer"]];
+            [rows addObject:[self switchWithTitle:@"HeadphoneAutoPause" key:@"headphoneAutoPause"]];
+#endif
+
+#ifdef ENABLE_GESTURES
+            [rows addObject:[self switchWithTitle:@"SwipeGestures" key:@"swipeGestures"]];
+#endif
+
+#ifdef ENABLE_CLIPBOARD
+            [rows addObject:[self switchWithTitle:@"ClipboardDetection" key:@"clipboardDetection"]];
+#endif
+
+            if (rows.count == 0) {
+                [rows addObject:[%c(YTSettingsSectionItem) itemWithTitle:LOC(@"NoModulesEnabled") accessibilityIdentifier:@"YTLiteSectionItem" detailTextBlock:nil selectBlock:nil]];
+            }
+
+            YTSettingsPickerViewController *picker = [[%c(YTSettingsPickerViewController) alloc] initWithNavTitle:LOC(@"PlusFeatures") pickerSectionTitle:nil rows:rows selectedItemIndex:NSNotFound parentResponder:[self parentResponder]];
+            [settingsViewController pushViewController:picker];
+            return YES;
+        }];
+
+        [sectionItems addObject:plusFeatures];
+
         [sectionItems addObject:space];
 
         YTSettingsSectionItem *speed = [YTSettingsSectionItemClass itemWithTitle:LOC(@"HoldToSpeed")

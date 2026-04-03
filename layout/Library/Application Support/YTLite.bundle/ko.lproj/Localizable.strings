@@ -731,3 +731,36 @@
 "SpeedLocation" = "활성화 위치 속도 향상";
 "TabIsHidden" = "숨겨진 탭은 시작 페이지로 선택할 수 없습니다";
 "TabIsStartupTab" = "시작 페이지로 선택된 탭은 숨길 수 없습니다";
+/* ──────────────────────────────────────────── */
+/* YouTube Plus v4.0 — 신규 모듈 문자열           */
+/* ──────────────────────────────────────────── */
+
+/* 수면 타이머 모듈 */
+"SleepTimer" = "수면 타이머";
+"SleepTimerDesc" = "설정된 시간 후 재생을 일시정지합니다.";
+"SleepTimerSet" = "%ld분 후 수면 타이머가 설정되었습니다";
+"SleepTimerMinutes" = "%ld분";
+"SleepTimerEndOfVideo" = "현재 영상 끝";
+"SleepTimerExpired" = "수면 타이머 만료 — 재생 일시정지됨";
+"SleepTimerCancelled" = "수면 타이머가 취소되었습니다";
+"SleepTimerCancel" = "타이머 취소";
+
+/* 헤드폰 자동 일시정지 */
+"HeadphoneAutoPause" = "헤드폰 분리 시 일시정지";
+"HeadphoneAutoPauseDesc" = "헤드폰 또는 블루투스 오디오 장치가 분리되면 자동으로 재생을 일시정지합니다.";
+
+/* 제스처 컨트롤 모듈 */
+"SwipeGestures" = "스와이프 제스처 컨트롤";
+"SwipeGesturesDesc" = "플레이어 오른쪽을 스와이프하여 볼륨, 왼쪽을 스와이프하여 밝기를 조절합니다 (ReVanced 스타일).";
+
+/* 클립보드 감지 모듈 */
+"ClipboardDetection" = "YouTube 링크 감지";
+"ClipboardDetectionDesc" = "앱 실행 시 클립보드의 YouTube 링크를 자동 감지하고 재생을 제안합니다.";
+"ClipboardDetected" = "YouTube 링크 감지됨";
+"ClipboardDetectedDesc" = "클립보드에서 YouTube 링크를 발견했습니다. 열겠습니까?";
+"Open" = "열기";
+"Dismiss" = "닫기";
+
+/* 설정 섹션 */
+"PlusFeatures" = "Plus 기능";
+"NoModulesEnabled" = "빌드 시 추가 모듈이 활성화되지 않았습니다.";

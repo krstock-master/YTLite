@@ -715,3 +715,36 @@
 "Conflicts.CloseYT" = "Close YouTube";
 
 "DonationReminder" = "Your support helps to make YouTube Plus even better.\n\nYou can contribute or choose to disable these notifications in the YouTube Plus settings. Thank you💜";
+/* ──────────────────────────────────────────── */
+/* YouTube Plus v4.0 — New Module Strings       */
+/* ──────────────────────────────────────────── */
+
+/* Sleep Timer Module */
+"SleepTimer" = "Sleep Timer";
+"SleepTimerDesc" = "Pause playback after a set duration.";
+"SleepTimerSet" = "Sleep timer set for %ld minutes";
+"SleepTimerMinutes" = "%ld minutes";
+"SleepTimerEndOfVideo" = "End of current video";
+"SleepTimerExpired" = "Sleep timer expired — playback paused";
+"SleepTimerCancelled" = "Sleep timer cancelled";
+"SleepTimerCancel" = "Cancel timer";
+
+/* Headphone Auto-Pause */
+"HeadphoneAutoPause" = "Pause on headphone disconnect";
+"HeadphoneAutoPauseDesc" = "Automatically pause playback when headphones or Bluetooth audio device is disconnected.";
+
+/* Gesture Controls Module */
+"SwipeGestures" = "Swipe gesture controls";
+"SwipeGesturesDesc" = "Swipe right side of player to adjust volume, left side for brightness (ReVanced-style).";
+
+/* Clipboard Detection Module */
+"ClipboardDetection" = "Detect YouTube links";
+"ClipboardDetectionDesc" = "Automatically detect YouTube links on clipboard when app opens and offer to play them.";
+"ClipboardDetected" = "YouTube Link Detected";
+"ClipboardDetectedDesc" = "A YouTube link was found on your clipboard. Would you like to open it?";
+"Open" = "Open";
+"Dismiss" = "Dismiss";
+
+/* Settings Section */
+"PlusFeatures" = "Plus Features";
+"NoModulesEnabled" = "No extra modules were enabled at build time.";

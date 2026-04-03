@@ -1,0 +1,316 @@
+# ──────────────────────────────────────────────────────────────
+# YouTube Plus — Build from Source + Module Selection
+# This workflow compiles the tweak from source code (not pre-built .deb),
+# enables optional feature modules, and packages the final IPA.
+# ──────────────────────────────────────────────────────────────
+name: "Build YouTube Plus (from source)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      ipa_url:
+        description: "URL to decrypted YouTube IPA"
+        required: true
+        type: string
+        default: ""
+
+      display_name:
+        description: "App display name"
+        required: true
+        type: string
+        default: "YouTube"
+
+      bundle_id:
+        description: "Bundle identifier"
+        required: true
+        type: string
+        default: "com.google.ios.youtube"
+
+      # ─── Core Integrations ───
+      enable_youpip:
+        description: "Integrate YouPiP (Picture-in-Picture)"
+        type: boolean
+        default: true
+
+      enable_ytuhd:
+        description: "Integrate YTUHD (4K/HDR support)"
+        type: boolean
+        default: true
+
+      enable_ryd:
+        description: "Integrate Return YouTube Dislikes"
+        type: boolean
+        default: true
+
+      enable_ytabc:
+        description: "Integrate YTABConfig (A/B flag control)"
+        type: boolean
+        default: false
+
+      enable_demc:
+        description: "Integrate DontEatMyContent (Dynamic Island fix)"
+        type: boolean
+        default: false
+
+      enable_yq:
+        description: "Integrate YouQuality"
+        type: boolean
+        default: false
+
+      # ─── New Feature Modules ───
+      enable_sleep_timer:
+        description: "Enable Sleep Timer module"
+        type: boolean
+        default: true
+
+      enable_gestures:
+        description: "Enable Advanced Gesture Controls"
+        type: boolean
+        default: true
+
+      enable_clipboard:
+        description: "Enable Clipboard Link Detection"
+        type: boolean
+        default: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  THEOS: ${{ github.workspace }}/theos
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Job 1: Build YTLite from source + companion tweaks
+  # ──────────────────────────────────────────────
+  build:
+    name: "Build Tweaks"
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install build dependencies
+        run: brew install make ldid dpkg
+
+      - name: Set PATH
+        run: |
+          echo "$(brew --prefix make)/libexec/gnubin" >> $GITHUB_PATH
+          echo "THEOS=${{ github.workspace }}/theos" >> $GITHUB_ENV
+
+      # ─── Theos Setup (cached) ───
+      - name: Cache Theos
+        id: theos-cache
+        uses: actions/cache@v5
+        with:
+          path: theos/
+          key: theos-v2-${{ hashFiles('.github/workflows/build_from_source.yml') }}
+          restore-keys: theos-v2-
+
+      - name: Setup Theos
+        if: steps.theos-cache.outputs.cache-hit != 'true'
+        uses: actions/checkout@v6
+        with:
+          repository: theos/theos
+          ref: 13c22376b5d83ff759c1993de0a861e673aa522b
+          path: theos
+          submodules: recursive
+
+      - name: Download iOS SDK
+        if: steps.theos-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --quiet -n --depth=1 --filter=tree:0 https://github.com/theos/sdks/
+          cd sdks
+          git sparse-checkout set --no-cone iPhoneOS16.5.sdk
+          git checkout
+          mv *.sdk $THEOS/sdks
+
+      # ─── Headers ───
+      - name: Setup YouTubeHeader & PSHeader
+        run: |
+          cd $THEOS/include
+          [ -d YouTubeHeader ] && (cd YouTubeHeader && git pull) || git clone --quiet --depth=1 https://github.com/PoomSmart/YouTubeHeader.git
+          [ -d PSHeader ] && (cd ../PSHeader && git pull) || git clone --quiet --depth=1 https://github.com/PoomSmart/PSHeader.git
+
+          # DontEatMyContent needs YTHeaders alias
+          if [ "${{ inputs.enable_demc }}" = "true" ]; then
+            rm -rf "$THEOS/include/YTHeaders"
+            cp -r "$THEOS/include/YouTubeHeader" "$THEOS/include/YTHeaders"
+          fi
+
+      # ─────────────────────────────────────
+      # Build YTLite FROM SOURCE (the main point of this workflow)
+      # ─────────────────────────────────────
+      - name: Build YTLite from source
+        run: |
+          BUILD_FLAGS="DEBUG=0 FINALPACKAGE=1"
+
+          # Add module flags based on inputs
+          if [ "${{ inputs.enable_sleep_timer }}" = "true" ]; then
+            BUILD_FLAGS="$BUILD_FLAGS ENABLE_SLEEP_TIMER=1"
+          fi
+          if [ "${{ inputs.enable_gestures }}" = "true" ]; then
+            BUILD_FLAGS="$BUILD_FLAGS ENABLE_GESTURES=1"
+          fi
+          if [ "${{ inputs.enable_clipboard }}" = "true" ]; then
+            BUILD_FLAGS="$BUILD_FLAGS ENABLE_CLIPBOARD=1"
+          fi
+
+          echo "::group::Building YTLite with flags: $BUILD_FLAGS"
+          make clean package $BUILD_FLAGS
+          echo "::endgroup::"
+
+          mv packages/*.deb ytplus.deb
+          echo "✅ YTLite built from source successfully"
+
+      # ─── Companion Tweaks (conditional) ───
+      - name: Clone companion tweaks
+        run: |
+          clone_if() { [ "$1" = "true" ] && git clone --quiet --depth=1 "$2" || true; }
+
+          clone_if "${{ inputs.enable_youpip }}" https://github.com/PoomSmart/YouPiP.git
+          clone_if "${{ inputs.enable_ytuhd }}" https://github.com/Tonwalter888/YTUHD.git
+          clone_if "${{ inputs.enable_ryd }}" https://github.com/PoomSmart/Return-YouTube-Dislikes.git
+          clone_if "${{ inputs.enable_ytabc }}" https://github.com/PoomSmart/YTABConfig.git
+          clone_if "${{ inputs.enable_yq }}" https://github.com/PoomSmart/YouQuality.git
+          clone_if "${{ inputs.enable_demc }}" https://github.com/therealFoxster/DontEatMyContent.git
+
+          # Shared dependencies
+          NEEDS_YGS=${{ inputs.enable_youpip || inputs.enable_ytuhd || inputs.enable_yq || inputs.enable_ryd || inputs.enable_demc }}
+          NEEDS_YTVO=${{ inputs.enable_yq || inputs.enable_youpip }}
+
+          [ "$NEEDS_YGS" = "true" ] && git clone --quiet --depth=1 https://github.com/PoomSmart/YouGroupSettings.git || true
+          [ "$NEEDS_YTVO" = "true" ] && git clone --quiet --depth=1 https://github.com/PoomSmart/YTVideoOverlay.git || true
+
+      - name: Build companion tweaks
+        run: |
+          build_tweak() {
+            local dir=$1
+            local output=$2
+            local extra_flags="${3:-}"
+            if [ -d "$dir" ]; then
+              echo "::group::Building $dir"
+              cd "$dir" && make clean package DEBUG=0 FINALPACKAGE=1 $extra_flags && cd ..
+              mv "$dir"/packages/*.deb "$output"
+              echo "::endgroup::"
+            fi
+          }
+
+          build_tweak YouPiP youpip.deb
+          build_tweak YTUHD ytuhd.deb "ARCHS=arm64"
+          build_tweak Return-YouTube-Dislikes ryd.deb
+          build_tweak YTABConfig ytabc.deb
+          build_tweak YouQuality yq.deb
+          build_tweak YouGroupSettings ygs.deb
+          build_tweak YTVideoOverlay ytvo.deb
+          build_tweak DontEatMyContent demc.deb
+
+      # ─── Safari Extension ───
+      - name: Clone Open in YouTube extension
+        run: |
+          git clone --quiet -n --depth=1 --filter=tree:0 https://github.com/BillyCurtis/OpenYouTubeSafariExtension
+          cd OpenYoutubeSafariExtension
+          git sparse-checkout set --no-cone OpenYoutubeSafariExtension.appex
+          git checkout
+          mv *.appex ..
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: built-debs
+          path: |
+            *.deb
+            *.appex
+          if-no-files-found: ignore
+          retention-days: 1
+
+  # ──────────────────────────────────────────────
+  # Job 2: Package IPA
+  # ──────────────────────────────────────────────
+  package:
+    name: "Package IPA"
+    runs-on: macos-latest
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download built artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: built-debs
+          path: ${{ github.workspace }}
+
+      - name: Hide sensitive inputs
+        uses: levibostian/action-hide-sensitive-inputs@v1
+        with:
+          exclude_inputs: bundle_id,display_name,enable_demc,enable_ryd,enable_ytabc,enable_youpip,enable_yq,enable_ytuhd,enable_sleep_timer,enable_gestures,enable_clipboard
+
+      - name: Download and validate IPA
+        run: |
+          wget "${{ inputs.ipa_url }}" --no-verbose -O youtube.ipa
+          file_type=$(file --mime-type -b youtube.ipa)
+          if [[ "$file_type" != "application/x-ios-app" && "$file_type" != "application/zip" ]]; then
+            echo "::error::Invalid IPA file. Detected type: $file_type"
+            exit 1
+          fi
+          echo "✅ IPA validated: $file_type"
+
+      - name: Install cyan (pyzule-rw)
+        run: pipx install --force https://github.com/asdfzxcvbn/pyzule-rw/archive/main.zip
+
+      - name: Inject tweaks into IPA
+        run: |
+          tweaks="ytplus.deb"
+
+          # Add Safari extension
+          [ -f "OpenYoutubeSafariExtension.appex" ] && tweaks="$tweaks OpenYoutubeSafariExtension.appex"
+
+          # Add all companion .deb files
+          for f in youpip.deb ytuhd.deb ryd.deb ytabc.deb yq.deb ygs.deb ytvo.deb demc.deb; do
+            [ -f "$f" ] && tweaks="$tweaks $f"
+          done
+
+          echo "Injecting: $tweaks"
+          cyan -i youtube.ipa -o "YouTubePlus_v4.0.0.ipa" -uwef $tweaks \
+               -n "${{ inputs.display_name }}" \
+               -b "${{ inputs.bundle_id }}"
+
+      - name: Generate build info
+        id: info
+        run: |
+          # Build a summary of enabled modules
+          MODULES=""
+          [ "${{ inputs.enable_youpip }}" = "true" ] && MODULES="$MODULES YouPiP,"
+          [ "${{ inputs.enable_ytuhd }}" = "true" ] && MODULES="$MODULES YTUHD,"
+          [ "${{ inputs.enable_ryd }}" = "true" ] && MODULES="$MODULES RYD,"
+          [ "${{ inputs.enable_sleep_timer }}" = "true" ] && MODULES="$MODULES SleepTimer,"
+          [ "${{ inputs.enable_gestures }}" = "true" ] && MODULES="$MODULES Gestures,"
+          [ "${{ inputs.enable_clipboard }}" = "true" ] && MODULES="$MODULES Clipboard,"
+          MODULES=$(echo "$MODULES" | sed 's/,$//')
+          echo "modules=$MODULES" >> $GITHUB_OUTPUT
+
+      - name: Upload to GitHub Releases
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          tag_name: v4.0.0-${{ github.run_number }}
+          name: "YouTube Plus v4.0.0 (Build ${{ github.run_number }})"
+          body: |
+            ## YouTube Plus v4.0.0
+
+            **Built from source** with modules: ${{ steps.info.outputs.modules }}
+
+            ### Build Configuration
+            - YouPiP: ${{ inputs.enable_youpip }}
+            - YTUHD: ${{ inputs.enable_ytuhd }}
+            - Return YT Dislikes: ${{ inputs.enable_ryd }}
+            - Sleep Timer: ${{ inputs.enable_sleep_timer }}
+            - Gesture Controls: ${{ inputs.enable_gestures }}
+            - Clipboard Detection: ${{ inputs.enable_clipboard }}
+          files: YouTubePlus_v4.0.0.ipa
+          draft: true
+
+      - name: Output release URL
+        run: echo "::notice::Release → https://github.com/${{ github.repository }}/releases"
