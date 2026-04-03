@@ -44,12 +44,18 @@ MODULE_FILES += Modules/ClipboardDetector/ClipboardDetector.x
 EXTRA_CFLAGS += -DENABLE_CLIPBOARD=1
 endif
 
+ifeq ($(ENABLE_ADBLOCK_PLUS),1)
+MODULE_FILES += Modules/AdBlock/AdBlock.x
+EXTRA_CFLAGS += -DENABLE_ADBLOCK_PLUS=1
+endif
+
 # Convenience: build everything
 ifeq ($(ENABLE_ALL_MODULES),1)
 MODULE_FILES += Modules/SleepTimer/SleepTimer.x
 MODULE_FILES += Modules/GestureControls/GestureControls.x
 MODULE_FILES += Modules/ClipboardDetector/ClipboardDetector.x
-EXTRA_CFLAGS += -DENABLE_SLEEP_TIMER=1 -DENABLE_GESTURES=1 -DENABLE_CLIPBOARD=1
+MODULE_FILES += Modules/AdBlock/AdBlock.x
+EXTRA_CFLAGS += -DENABLE_SLEEP_TIMER=1 -DENABLE_GESTURES=1 -DENABLE_CLIPBOARD=1 -DENABLE_ADBLOCK_PLUS=1
 endif
 
 # ──────────────────────────────────────────────

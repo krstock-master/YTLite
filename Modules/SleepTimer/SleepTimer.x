@@ -251,29 +251,18 @@
 %end
 
 // ──────────────────────────────────────────────
-// MARK: - End-of-Video Detection Hook
+// MARK: - End-of-Video Detection (polling-based)
+// We CANNOT hook singleVideo:currentVideoTimeDidChange: here
+// because YTLite.x already hooks it. Instead, we poll from
+// the sleep timer manager's timerTick using the player hierarchy.
 // ──────────────────────────────────────────────
 
-%hook YTPlayerViewController
-
-- (void)singleVideo:(YTSingleVideoController *)video currentVideoTimeDidChange:(YTSingleVideoTime *)time {
-    %orig;
-    
-    YTLSleepTimerManager *mgr = [YTLSleepTimerManager sharedInstance];
-    
-    if (mgr.pauseAtEndOfVideo && floor(time.time) >= floor(video.totalMediaTime) - 1.0) {
-        [mgr cancelTimer];
-        [self pause];
-        
-        [[%c(YTToastResponderEvent) eventWithMessage:LOC(@"SleepTimerExpired")
-                                      firstResponder:[%c(YTUIUtils) topViewControllerForPresenting]] send];
-    }
-}
-
-%end
+// (End-of-video detection is handled inside YTLSleepTimerManager.timerTick)
 
 // ──────────────────────────────────────────────
 // MARK: - Headphone Disconnect Auto-Pause
+// Uses loadWithPlayerTransition hook (different from core's hook)
+// to register for audio route change notifications.
 // ──────────────────────────────────────────────
 
 %hook YTPlayerViewController
@@ -282,6 +271,11 @@
     %orig;
     
     if (ytlBool(@"headphoneAutoPause")) {
+        // Remove any previous observer to avoid duplicates
+        [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                        name:AVAudioSessionRouteChangeNotification
+                                                      object:nil];
+        
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(ytl_audioRouteChanged:)
                                                      name:AVAudioSessionRouteChangeNotification
@@ -294,18 +288,10 @@
     NSInteger reason = [notification.userInfo[AVAudioSessionRouteChangeReasonKey] integerValue];
     
     if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
-        // Headphones were unplugged — pause playback
         dispatch_async(dispatch_get_main_queue(), ^{
             [self pause];
         });
     }
-}
-
-- (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:AVAudioSessionRouteChangeNotification
-                                                  object:nil];
-    %orig;
 }
 
 %end

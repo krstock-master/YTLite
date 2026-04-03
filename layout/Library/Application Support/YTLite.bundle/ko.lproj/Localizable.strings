@@ -764,3 +764,7 @@
 /* 설정 섹션 */
 "PlusFeatures" = "Plus 기능";
 "NoModulesEnabled" = "빌드 시 추가 모듈이 활성화되지 않았습니다.";
+
+/* 강화된 광고 차단 모듈 */
+"EnhancedAdBlock" = "강화된 광고 차단";
+"EnhancedAdBlockDesc" = "7단계 심층 광고 제거: 서버 응답에서 광고 데이터 제거, 모든 광고 렌더러 차단, Shorts 광고, Premium 팝업, 쇼핑 선반, 알림 프로모션 제거.";

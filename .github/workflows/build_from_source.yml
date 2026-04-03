@@ -73,6 +73,11 @@ on:
         type: boolean
         default: true
 
+      enable_adblock_plus:
+        description: "Enable Enhanced Ad Blocking (7-layer deep hooks)"
+        type: boolean
+        default: true
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -156,6 +161,9 @@ jobs:
           fi
           if [ "${{ inputs.enable_clipboard }}" = "true" ]; then
             BUILD_FLAGS="$BUILD_FLAGS ENABLE_CLIPBOARD=1"
+          fi
+          if [ "${{ inputs.enable_adblock_plus }}" = "true" ]; then
+            BUILD_FLAGS="$BUILD_FLAGS ENABLE_ADBLOCK_PLUS=1"
           fi
 
           echo "::group::Building YTLite with flags: $BUILD_FLAGS"
@@ -246,7 +254,7 @@ jobs:
       - name: Hide sensitive inputs
         uses: levibostian/action-hide-sensitive-inputs@v1
         with:
-          exclude_inputs: bundle_id,display_name,enable_demc,enable_ryd,enable_ytabc,enable_youpip,enable_yq,enable_ytuhd,enable_sleep_timer,enable_gestures,enable_clipboard
+          exclude_inputs: bundle_id,display_name,enable_demc,enable_ryd,enable_ytabc,enable_youpip,enable_yq,enable_ytuhd,enable_sleep_timer,enable_gestures,enable_clipboard,enable_adblock_plus
 
       - name: Download and validate IPA
         run: |
@@ -289,6 +297,7 @@ jobs:
           [ "${{ inputs.enable_sleep_timer }}" = "true" ] && MODULES="$MODULES SleepTimer,"
           [ "${{ inputs.enable_gestures }}" = "true" ] && MODULES="$MODULES Gestures,"
           [ "${{ inputs.enable_clipboard }}" = "true" ] && MODULES="$MODULES Clipboard,"
+          [ "${{ inputs.enable_adblock_plus }}" = "true" ] && MODULES="$MODULES AdBlockPlus,"
           MODULES=$(echo "$MODULES" | sed 's/,$//')
           echo "modules=$MODULES" >> $GITHUB_OUTPUT
 
@@ -309,6 +318,7 @@ jobs:
             - Sleep Timer: ${{ inputs.enable_sleep_timer }}
             - Gesture Controls: ${{ inputs.enable_gestures }}
             - Clipboard Detection: ${{ inputs.enable_clipboard }}
+            - Enhanced Ad Block: ${{ inputs.enable_adblock_plus }}
           files: YouTubePlus_v4.0.0.ipa
           draft: true
 

@@ -38,9 +38,28 @@ static UIImage *YTImageNamed(NSString *imageName) {
 
     NSString *description = [self description];
 
-    NSArray *ads = @[@"brand_promo", @"product_carousel", @"product_engagement_panel", @"product_item", @"text_search_ad", @"text_image_button_layout", @"carousel_headered_layout", @"carousel_footered_layout", @"square_image_layout", @"landscape_image_wide_button_layout", @"feed_ad_metadata"];
-    if (ytlBool(@"noAds") && [ads containsObject:description]) {
-        return [NSData data];
+    if (ytlBool(@"noAds")) {
+        // Static array for performance (created once)
+        static NSArray *adPatterns = nil;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            adPatterns = @[
+                @"brand_promo", @"product_carousel", @"product_engagement_panel",
+                @"product_item", @"text_search_ad", @"text_image_button_layout",
+                @"carousel_headered_layout", @"carousel_footered_layout",
+                @"square_image_layout", @"landscape_image_wide_button_layout",
+                @"feed_ad_metadata", @"statement_banner", @"compact_promoted",
+                @"in_feed_ad", @"promoted_video", @"shopping_carousel",
+                @"merch_shelf", @"primetime_promo", @"movie_offer",
+                @"offer_module", @"inline_survey", @"banner_text_image"
+            ];
+        });
+
+        for (NSString *adID in adPatterns) {
+            if ([description containsString:adID]) {
+                return [NSData data];
+            }
+        }
     }
 
     NSArray *shortsToRemove = @[@"shorts_shelf.eml", @"shorts_video_cell.eml", @"6Shorts"];
@@ -61,7 +80,27 @@ static UIImage *YTImageNamed(NSString *imageName) {
         NSIndexSet *removeIndexes = [contentsArray indexesOfObjectsPassingTest:^BOOL(YTISectionListSupportedRenderers *renderers, NSUInteger idx, BOOL *stop) {
             YTIItemSectionRenderer *sectionRenderer = renderers.itemSectionRenderer;
             YTIItemSectionSupportedRenderers *firstObject = [sectionRenderer.contentsArray firstObject];
-            return firstObject.hasPromotedVideoRenderer || firstObject.hasCompactPromotedVideoRenderer || firstObject.hasPromotedVideoInlineMutedRenderer;
+
+            // Original checks
+            if (firstObject.hasPromotedVideoRenderer ||
+                firstObject.hasCompactPromotedVideoRenderer ||
+                firstObject.hasPromotedVideoInlineMutedRenderer) {
+                return YES;
+            }
+
+            // Additional checks: description-based detection for ad sections
+            NSString *sectionDesc = [renderers description];
+            if (sectionDesc &&
+                ([sectionDesc containsString:@"statement_banner"] ||
+                 [sectionDesc containsString:@"primetime_promo"] ||
+                 [sectionDesc containsString:@"product_carousel"] ||
+                 [sectionDesc containsString:@"brand_video_shelf"] ||
+                 [sectionDesc containsString:@"brand_video_singleton"] ||
+                 [sectionDesc containsString:@"promoted_item"])) {
+                return YES;
+            }
+
+            return NO;
         }];
         [contentsArray removeObjectsAtIndexes:removeIndexes];
     } %orig;
@@ -530,11 +569,34 @@ void autoSkipShorts(YTPlayerViewController *self, YTSingleVideoController *video
     }
 }
 
+// Sleep Timer: end-of-video detection (only compiled when module is enabled)
+#ifdef ENABLE_SLEEP_TIMER
+void checkSleepTimerEndOfVideo(YTPlayerViewController *playerVC, YTSingleVideoController *video, YTSingleVideoTime *time) {
+    Class mgrClass = NSClassFromString(@"YTLSleepTimerManager");
+    if (!mgrClass) return;
+    
+    id mgr = [mgrClass sharedInstance];
+    if (![mgr isTimerActive]) return;
+    if (![mgr pauseAtEndOfVideo]) return;
+    
+    if (floor(time.time) >= floor(video.totalMediaTime) - 1.0) {
+        [mgr cancelTimer];
+        [playerVC pause];
+        
+        [[%c(YTToastResponderEvent) eventWithMessage:LOC(@"SleepTimerExpired")
+                                      firstResponder:[%c(YTUIUtils) topViewControllerForPresenting]] send];
+    }
+}
+#endif
+
 - (void)singleVideo:(YTSingleVideoController *)video currentVideoTimeDidChange:(YTSingleVideoTime *)time {
     %orig;
 
     addEndTime(self, video, time);
     autoSkipShorts(self, video, time);
+#ifdef ENABLE_SLEEP_TIMER
+    checkSleepTimerEndOfVideo(self, video, time);
+#endif
 }
 
 - (void)potentiallyMutatedSingleVideo:(YTSingleVideoController *)video currentVideoTimeDidChange:(YTSingleVideoTime *)time {
@@ -542,6 +604,9 @@ void autoSkipShorts(YTPlayerViewController *self, YTSingleVideoController *video
 
     addEndTime(self, video, time);
     autoSkipShorts(self, video, time);
+#ifdef ENABLE_SLEEP_TIMER
+    checkSleepTimerEndOfVideo(self, video, time);
+#endif
 }
 %end
 

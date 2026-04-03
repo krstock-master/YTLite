@@ -748,3 +748,7 @@
 /* Settings Section */
 "PlusFeatures" = "Plus Features";
 "NoModulesEnabled" = "No extra modules were enabled at build time.";
+
+/* Enhanced Ad Block Module */
+"EnhancedAdBlock" = "Enhanced ad blocking";
+"EnhancedAdBlockDesc" = "7-layer deep ad removal: strips ads from server responses, blocks all known ad renderers, removes Shorts ads, Premium upsells, shopping shelves, and notification promos.";

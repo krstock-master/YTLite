@@ -359,6 +359,10 @@ static NSString *GetCacheSize() {
             [rows addObject:[self switchWithTitle:@"ClipboardDetection" key:@"clipboardDetection"]];
 #endif
 
+#ifdef ENABLE_ADBLOCK_PLUS
+            [rows addObject:[self switchWithTitle:@"EnhancedAdBlock" key:@"noAds"]];
+#endif
+
             if (rows.count == 0) {
                 [rows addObject:[%c(YTSettingsSectionItem) itemWithTitle:LOC(@"NoModulesEnabled") accessibilityIdentifier:@"YTLiteSectionItem" detailTextBlock:nil selectBlock:nil]];
             }
