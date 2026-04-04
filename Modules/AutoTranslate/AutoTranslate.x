@@ -128,61 +128,7 @@
 
 // ──────────────────────────────────────────────
 // MARK: - Comment Translation
-// Adds "Translate" action to comment/post action sheets
+// The "Translate" action is injected into comment sheets
+// via the core YTLite.x presentFromViewController: hook
+// (guarded by #ifdef ENABLE_AUTO_TRANSLATE).
 // ──────────────────────────────────────────────
-%hook YTDefaultSheetController
-
-- (void)presentFromViewController:(UIViewController *)vc animated:(BOOL)animated completion:(void(^)(void))completion {
-    if (ytlBool(@"autoTranslate")) {
-        // Check if this is a comment-related sheet by inspecting actions
-        // We add a translate action if there's a "Copy" action (indicating comment menu)
-        NSArray *actions = [self valueForKey:@"_actions"];
-        BOOL isCommentSheet = NO;
-        NSString *textToCopy = nil;
-        
-        for (id action in actions) {
-            NSString *title = [action valueForKey:@"_title"];
-            if ([title isEqualToString:LOC(@"CopyCommentText")] ||
-                [title isEqualToString:LOC(@"CopyPostText")]) {
-                isCommentSheet = YES;
-                break;
-            }
-        }
-        
-        if (isCommentSheet) {
-            // Get the text from clipboard after copy (it will be set by the copy action)
-            [self addAction:[%c(YTActionSheetAction)
-                actionWithTitle:LOC(@"TranslateText")
-                      iconImage:[UIImage systemImageNamed:@"globe"]
-                          style:0
-                        handler:^{
-                // Read the most recent clipboard content (user likely copies first)
-                NSString *text = [UIPasteboard generalPasteboard].string;
-                if (!text || text.length == 0) {
-                    [[%c(YTToastResponderEvent) eventWithMessage:LOC(@"TranslateNoText") firstResponder:vc] send];
-                    return;
-                }
-                
-                [[%c(YTToastResponderEvent) eventWithMessage:LOC(@"Translating") firstResponder:vc] send];
-                
-                [[YTLTranslateManager sharedInstance] translateText:text completion:^(NSString *translated, NSError *error) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        if (error) {
-                            [[%c(YTToastResponderEvent) eventWithMessage:error.localizedDescription firstResponder:vc] send];
-                            return;
-                        }
-                        
-                        YTAlertView *alert = [%c(YTAlertView) infoDialog];
-                        alert.title = LOC(@"TranslatedComment");
-                        alert.subtitle = translated;
-                        [alert show];
-                    });
-                }];
-            }]];
-        }
-    }
-    
-    %orig;
-}
-
-%end

@@ -93,6 +93,11 @@ on:
         type: boolean
         default: true
 
+      enable_download_plus:
+        description: "Enable Download Plus (subtitle export, playlist queue)"
+        type: boolean
+        default: true
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -189,6 +194,9 @@ jobs:
           if [ "${{ inputs.enable_auto_translate }}" = "true" ]; then
             BUILD_FLAGS="$BUILD_FLAGS ENABLE_AUTO_TRANSLATE=1"
           fi
+          if [ "${{ inputs.enable_download_plus }}" = "true" ]; then
+            BUILD_FLAGS="$BUILD_FLAGS ENABLE_DOWNLOAD_PLUS=1"
+          fi
 
           echo "::group::Building YTLite with flags: $BUILD_FLAGS"
           make clean package $BUILD_FLAGS
@@ -278,7 +286,7 @@ jobs:
       - name: Hide sensitive inputs
         uses: levibostian/action-hide-sensitive-inputs@v1
         with:
-          exclude_inputs: bundle_id,display_name,enable_demc,enable_ryd,enable_ytabc,enable_youpip,enable_yq,enable_ytuhd,enable_sleep_timer,enable_gestures,enable_clipboard,enable_adblock_plus,enable_oled,enable_ai_summary,enable_auto_translate
+          exclude_inputs: bundle_id,display_name,enable_demc,enable_ryd,enable_ytabc,enable_youpip,enable_yq,enable_ytuhd,enable_sleep_timer,enable_gestures,enable_clipboard,enable_adblock_plus,enable_oled,enable_ai_summary,enable_auto_translate,enable_download_plus
 
       - name: Download and validate IPA
         run: |
@@ -325,6 +333,7 @@ jobs:
           [ "${{ inputs.enable_oled }}" = "true" ] && MODULES="$MODULES OLEDTheme,"
           [ "${{ inputs.enable_ai_summary }}" = "true" ] && MODULES="$MODULES AISummary,"
           [ "${{ inputs.enable_auto_translate }}" = "true" ] && MODULES="$MODULES AutoTranslate,"
+          [ "${{ inputs.enable_download_plus }}" = "true" ] && MODULES="$MODULES DownloadPlus,"
           MODULES=$(echo "$MODULES" | sed 's/,$//')
           echo "modules=$MODULES" >> $GITHUB_OUTPUT
 
@@ -349,6 +358,7 @@ jobs:
             - OLED Pure Black: ${{ inputs.enable_oled }}
             - AI Video Summary: ${{ inputs.enable_ai_summary }}
             - Auto-Translate: ${{ inputs.enable_auto_translate }}
+            - Download Plus: ${{ inputs.enable_download_plus }}
           files: YouTubePlus_v4.0.0.ipa
           draft: true
 

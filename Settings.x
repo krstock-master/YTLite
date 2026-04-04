@@ -375,6 +375,10 @@ static NSString *GetCacheSize() {
             [rows addObject:[self switchWithTitle:@"AutoTranslate" key:@"autoTranslate"]];
 #endif
 
+#ifdef ENABLE_DOWNLOAD_PLUS
+            [rows addObject:[self switchWithTitle:@"DownloadPlus" key:@"downloadPlus"]];
+#endif
+
 #if defined(ENABLE_AI_SUMMARY) || defined(ENABLE_AUTO_TRANSLATE)
             // AI API Provider selector
             [rows addObject:[YTSettingsSectionItemClass itemWithTitle:LOC(@"AIProvider")

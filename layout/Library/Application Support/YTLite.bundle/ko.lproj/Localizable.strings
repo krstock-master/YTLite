@@ -799,3 +799,13 @@
 "NotSet" = "설정되지 않음";
 "Save" = "저장";
 "Cancel" = "취소";
+
+/* 다운로드 플러스 모듈 */
+"DownloadPlus" = "다운로드 플러스";
+"DownloadPlusDesc" = "자막 내보내기 (.srt) 및 플레이리스트 일괄 다운로드 기능을 추가합니다.";
+"ExportSubtitles" = "자막 내보내기 (.srt)";
+"SubtitleExporting" = "자막 가져오는 중...";
+"SubtitleNotFound" = "이 영상에 자막이 없습니다";
+"PlaylistQueued" = "%lu개 영상이 다운로드 대기열에 추가됨";
+"PlaylistComplete" = "플레이리스트 다운로드 완료: %ld개 영상";
+"PlaylistCancelled" = "플레이리스트 다운로드 취소됨";

@@ -783,3 +783,13 @@
 "NotSet" = "Not set";
 "Save" = "Save";
 "Cancel" = "Cancel";
+
+/* Download Plus Module */
+"DownloadPlus" = "Download Plus";
+"DownloadPlusDesc" = "Adds subtitle export (.srt) and playlist batch download capabilities.";
+"ExportSubtitles" = "Export subtitles (.srt)";
+"SubtitleExporting" = "Fetching subtitles...";
+"SubtitleNotFound" = "No subtitles found for this video";
+"PlaylistQueued" = "%lu videos added to download queue";
+"PlaylistComplete" = "Playlist download complete: %ld videos";
+"PlaylistCancelled" = "Playlist download cancelled";

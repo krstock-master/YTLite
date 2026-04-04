@@ -709,6 +709,104 @@ void checkSleepTimerEndOfVideo(YTPlayerViewController *playerVC, YTSingleVideoCo
         %orig;
     }
 }
+
+// ── Module Action Injection (unified hook to avoid conflicts) ──
+#if defined(ENABLE_AUTO_TRANSLATE) || defined(ENABLE_DOWNLOAD_PLUS)
+- (void)presentFromViewController:(UIViewController *)vc animated:(BOOL)animated completion:(void(^)(void))completion {
+    NSArray *actions = [self valueForKey:@"_actions"];
+
+#ifdef ENABLE_AUTO_TRANSLATE
+    if (ytlBool(@"autoTranslate")) {
+        // Detect comment/post sheets and add "Translate" action
+        BOOL isCommentSheet = NO;
+        for (id action in actions) {
+            NSString *title = [action valueForKey:@"_title"];
+            if ([title isEqualToString:LOC(@"CopyCommentText")] ||
+                [title isEqualToString:LOC(@"CopyPostText")]) {
+                isCommentSheet = YES;
+                break;
+            }
+        }
+
+        if (isCommentSheet) {
+            [self addAction:[%c(YTActionSheetAction)
+                actionWithTitle:LOC(@"TranslateText")
+                      iconImage:[UIImage systemImageNamed:@"globe"]
+                          style:0
+                        handler:^{
+                NSString *text = [UIPasteboard generalPasteboard].string;
+                if (!text || text.length == 0) {
+                    [[%c(YTToastResponderEvent) eventWithMessage:LOC(@"TranslateNoText") firstResponder:vc] send];
+                    return;
+                }
+
+                [[%c(YTToastResponderEvent) eventWithMessage:LOC(@"Translating") firstResponder:vc] send];
+
+                Class mgrClass = NSClassFromString(@"YTLTranslateManager");
+                if (mgrClass) {
+                    [[mgrClass sharedInstance] translateText:text completion:^(NSString *translated, NSError *error) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            if (error) {
+                                [[%c(YTToastResponderEvent) eventWithMessage:error.localizedDescription firstResponder:vc] send];
+                                return;
+                            }
+                            YTAlertView *alert = [%c(YTAlertView) infoDialog];
+                            alert.title = LOC(@"TranslatedComment");
+                            alert.subtitle = translated;
+                            [alert show];
+                        });
+                    }];
+                }
+            }]];
+        }
+    }
+#endif
+
+#ifdef ENABLE_DOWNLOAD_PLUS
+    if (ytlBool(@"downloadPlus")) {
+        // Detect video action sheets (has download menu item ID "7") and add "Export Subtitles"
+        BOOL hasDownloadAction = NO;
+        for (id action in actions) {
+            NSString *identifier = [action valueForKey:@"_accessibilityIdentifier"];
+            if ([identifier isEqualToString:@"7"]) { hasDownloadAction = YES; break; }
+        }
+
+        if (hasDownloadAction) {
+            [self addAction:[%c(YTActionSheetAction)
+                actionWithTitle:LOC(@"ExportSubtitles")
+                      iconImage:[UIImage systemImageNamed:@"text.bubble"]
+                          style:0
+                        handler:^{
+                UIViewController *topVC = [%c(YTUIUtils) topViewControllerForPresenting];
+                UIViewController *current = topVC;
+                NSString *videoID = nil;
+                NSString *title = nil;
+
+                while (current) {
+                    if ([current isKindOfClass:%c(YTWatchViewController)]) {
+                        YTWatchViewController *watchVC = (YTWatchViewController *)current;
+                        videoID = watchVC.playerViewController.contentVideoID;
+                        title = watchVC.playerViewController.playerResponse.playerData.videoDetails.title;
+                        break;
+                    }
+                    current = current.parentViewController;
+                }
+
+                if (videoID) {
+                    Class exporterClass = NSClassFromString(@"YTLSubtitleExporter");
+                    if (exporterClass) {
+                        [[exporterClass sharedInstance] exportSubtitlesForVideoID:videoID title:title ?: @"video" fromController:topVC];
+                    }
+                }
+            }]];
+        }
+    }
+#endif
+
+    %orig;
+}
+#endif
+
 %end
 
 // Hide buttons under the video player (@PoomSmart)
