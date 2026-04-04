@@ -809,3 +809,6 @@
 "PlaylistQueued" = "%lu개 영상이 다운로드 대기열에 추가됨";
 "PlaylistComplete" = "플레이리스트 다운로드 완료: %ld개 영상";
 "PlaylistCancelled" = "플레이리스트 다운로드 취소됨";
+
+/* 크레딧 */
+"OriginalProject" = "원본 프로젝트 (dayanch96)";

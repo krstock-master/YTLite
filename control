@@ -3,9 +3,7 @@ Name: YouTube Plus
 Depends: mobilesubstrate
 Version: 4.0.0
 Architecture: iphoneos-arm
-Description: Ultimate YouTube Enhancer — Ad removal, SponsorBlock, background playback, downloads, sleep timer, gesture controls, clipboard detection, and 100+ customization options.
+Description: Ultimate YouTube Enhancer — Ad removal, background playback, downloads, sleep timer, gesture controls, and 100+ customization options.
 Maintainer: krstock-master
-Author: dvntm (original), krstock-master (fork)
+Author: krstock-master
 Section: Tweaks
-Icon: https://raw.githubusercontent.com/dayanch96/icons/main/ytlite.png
-SileoDepiction: https://raw.githubusercontent.com/dayanch96/icons/main/ytlite.json

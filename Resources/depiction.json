@@ -1,6 +1,6 @@
-  {
+{
     "minVersion": "0.1",
-    "headerImage": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/header.png",
+    "headerImage": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/header.png",
     "class": "DepictionTabView",
     "tintColor": "#E36678",
     "tabs": [
@@ -25,39 +25,39 @@
                     "screenshots": [
                         {
                             "accessibilityText": "Screenshot0",
-                            "url": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/scr1.jpg"
+                            "url": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/scr1.jpg"
                         },
                         {
                             "accessibilityText": "Screenshot1",
-                            "url": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/scr2.jpg"
+                            "url": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/scr2.jpg"
                         },
                         {
                             "accessibilityText": "Screenshot2",
-                            "url": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/scr3.jpg"
+                            "url": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/scr3.jpg"
                         },
                         {
                             "accessibilityText": "Screenshot3",
-                            "url": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/scr4.jpg"
+                            "url": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/scr4.jpg"
                         },
                         {
                             "accessibilityText": "Screenshot4",
-                            "url": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/scr5.jpg"
+                            "url": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/scr5.jpg"
                         },
                         {
                             "accessibilityText": "Screenshot5",
-                            "url": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/scr6.jpg"
+                            "url": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/scr6.jpg"
                         },
                         {
                             "accessibilityText": "Screenshot6",
-                            "url": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/scr7.jpg"
+                            "url": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/scr7.jpg"
                         },
                         {
                             "accessibilityText": "Screenshot7",
-                            "url": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/scr8.jpg"
+                            "url": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/scr8.jpg"
                         },
                         {
                             "accessibilityText": "Screenshot8",
-                            "url": "https://raw.githubusercontent.com/dayanch96/YTLite/refs/heads/main/Resources/scr9.jpg"
+                            "url": "https://raw.githubusercontent.com/krstock-master/YTLite/refs/heads/main/Resources/scr9.jpg"
                         }
                     ],
                     "itemSize": "{160, 275.41333333333336}",
@@ -79,7 +79,7 @@
                     "class": "DepictionSpacerView"
                 },
                 {
-                    "text": "dayanch96",
+                    "text": "krstock-master (fork of dayanch96)",
                     "class": "DepictionTableTextView",
                     "title": "Developer"
                 },
@@ -92,18 +92,7 @@
             "tabname": "Details"
         },
         {
-            "views": [
-                {
-                    "class": "DepictionTableButtonView",
-                    "title": "My Patreon",
-                    "action": "https://patreon.com/dayanch96"
-                },
-                {
-                    "class": "DepictionTableButtonView",
-                    "title": "Buy me a coffee",
-                    "action": "https://buymeacoffee.com/dayanch96"
-                }
-            ],
+            "views": [],
             "class": "DepictionStackView",
             "tabname": "Support"
         }

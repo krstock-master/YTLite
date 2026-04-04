@@ -793,3 +793,6 @@
 "PlaylistQueued" = "%lu videos added to download queue";
 "PlaylistComplete" = "Playlist download complete: %ld videos";
 "PlaylistCancelled" = "Playlist download cancelled";
+
+/* Credits */
+"OriginalProject" = "Original project (dayanch96)";
