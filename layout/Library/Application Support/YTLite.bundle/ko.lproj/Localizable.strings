@@ -768,3 +768,7 @@
 /* 강화된 광고 차단 모듈 */
 "EnhancedAdBlock" = "강화된 광고 차단";
 "EnhancedAdBlockDesc" = "7단계 심층 광고 제거: 서버 응답에서 광고 데이터 제거, 모든 광고 렌더러 차단, Shorts 광고, Premium 팝업, 쇼핑 선반, 알림 프로모션 제거.";
+
+/* OLED 테마 모듈 */
+"OLEDMode" = "OLED 순수 블랙 모드";
+"OLEDModeDesc" = "다크 모드 활성화 시 모든 어두운 회색 배경을 순수 블랙으로 변환합니다. OLED 디스플레이에서 배터리를 절약합니다.";

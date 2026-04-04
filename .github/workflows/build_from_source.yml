@@ -78,6 +78,11 @@ on:
         type: boolean
         default: true
 
+      enable_oled:
+        description: "Enable OLED Pure Black Mode"
+        type: boolean
+        default: true
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -164,6 +169,9 @@ jobs:
           fi
           if [ "${{ inputs.enable_adblock_plus }}" = "true" ]; then
             BUILD_FLAGS="$BUILD_FLAGS ENABLE_ADBLOCK_PLUS=1"
+          fi
+          if [ "${{ inputs.enable_oled }}" = "true" ]; then
+            BUILD_FLAGS="$BUILD_FLAGS ENABLE_OLED=1"
           fi
 
           echo "::group::Building YTLite with flags: $BUILD_FLAGS"
@@ -254,7 +262,7 @@ jobs:
       - name: Hide sensitive inputs
         uses: levibostian/action-hide-sensitive-inputs@v1
         with:
-          exclude_inputs: bundle_id,display_name,enable_demc,enable_ryd,enable_ytabc,enable_youpip,enable_yq,enable_ytuhd,enable_sleep_timer,enable_gestures,enable_clipboard,enable_adblock_plus
+          exclude_inputs: bundle_id,display_name,enable_demc,enable_ryd,enable_ytabc,enable_youpip,enable_yq,enable_ytuhd,enable_sleep_timer,enable_gestures,enable_clipboard,enable_adblock_plus,enable_oled
 
       - name: Download and validate IPA
         run: |
@@ -298,6 +306,7 @@ jobs:
           [ "${{ inputs.enable_gestures }}" = "true" ] && MODULES="$MODULES Gestures,"
           [ "${{ inputs.enable_clipboard }}" = "true" ] && MODULES="$MODULES Clipboard,"
           [ "${{ inputs.enable_adblock_plus }}" = "true" ] && MODULES="$MODULES AdBlockPlus,"
+          [ "${{ inputs.enable_oled }}" = "true" ] && MODULES="$MODULES OLEDTheme,"
           MODULES=$(echo "$MODULES" | sed 's/,$//')
           echo "modules=$MODULES" >> $GITHUB_OUTPUT
 
@@ -319,6 +328,7 @@ jobs:
             - Gesture Controls: ${{ inputs.enable_gestures }}
             - Clipboard Detection: ${{ inputs.enable_clipboard }}
             - Enhanced Ad Block: ${{ inputs.enable_adblock_plus }}
+            - OLED Pure Black: ${{ inputs.enable_oled }}
           files: YouTubePlus_v4.0.0.ipa
           draft: true
 

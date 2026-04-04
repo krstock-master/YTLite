@@ -363,6 +363,10 @@ static NSString *GetCacheSize() {
             [rows addObject:[self switchWithTitle:@"EnhancedAdBlock" key:@"noAds"]];
 #endif
 
+#ifdef ENABLE_OLED
+            [rows addObject:[self switchWithTitle:@"OLEDMode" key:@"oledMode"]];
+#endif
+
             if (rows.count == 0) {
                 [rows addObject:[%c(YTSettingsSectionItem) itemWithTitle:LOC(@"NoModulesEnabled") accessibilityIdentifier:@"YTLiteSectionItem" detailTextBlock:nil selectBlock:nil]];
             }

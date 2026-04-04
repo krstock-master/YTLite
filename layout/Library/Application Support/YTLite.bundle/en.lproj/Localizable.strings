@@ -752,3 +752,7 @@
 /* Enhanced Ad Block Module */
 "EnhancedAdBlock" = "Enhanced ad blocking";
 "EnhancedAdBlockDesc" = "7-layer deep ad removal: strips ads from server responses, blocks all known ad renderers, removes Shorts ads, Premium upsells, shopping shelves, and notification promos.";
+
+/* OLED Theme Module */
+"OLEDMode" = "OLED pure black mode";
+"OLEDModeDesc" = "Replaces all dark gray backgrounds with pure black when dark mode is active. Saves battery on OLED displays.";
