@@ -756,3 +756,30 @@
 /* OLED Theme Module */
 "OLEDMode" = "OLED pure black mode";
 "OLEDModeDesc" = "Replaces all dark gray backgrounds with pure black when dark mode is active. Saves battery on OLED displays.";
+
+/* AI Summary Module */
+"AISummary" = "AI video summary";
+"AISummaryDesc" = "Adds a sparkle button to the video description panel. Tap to generate an AI-powered summary of the video transcript.";
+"AISummaryLoading" = "Fetching transcript & generating summary...";
+"AISummaryNoKey" = "Set your AI API key in YTLite → Plus Features";
+"AISummaryNoTranscript" = "No captions/transcript available for this video";
+
+/* Auto-Translate Module */
+"AutoTranslate" = "Auto-translate";
+"AutoTranslateDesc" = "Adds translate buttons to video descriptions and comment menus. Uses your configured AI API.";
+"Translate" = "Translate";
+"TranslateText" = "Translate text";
+"TranslateNoText" = "No text to translate";
+"TranslateNoKey" = "Set your AI API key in YTLite → Plus Features";
+"Translating" = "Translating...";
+"TranslatedDescription" = "Translated Description";
+"TranslatedComment" = "Translated Comment";
+
+/* AI Settings */
+"AIProvider" = "AI provider";
+"AIApiKey" = "API key";
+"AIApiKeyDesc" = "Enter your API key (Groq, OpenRouter, or custom). Your key is stored locally and never shared.";
+"Custom" = "Custom";
+"NotSet" = "Not set";
+"Save" = "Save";
+"Cancel" = "Cancel";

@@ -54,6 +54,16 @@ MODULE_FILES += Modules/OLEDTheme/OLEDTheme.x
 EXTRA_CFLAGS += -DENABLE_OLED=1
 endif
 
+ifeq ($(ENABLE_AI_SUMMARY),1)
+MODULE_FILES += Modules/AISummary/AISummary.x
+EXTRA_CFLAGS += -DENABLE_AI_SUMMARY=1
+endif
+
+ifeq ($(ENABLE_AUTO_TRANSLATE),1)
+MODULE_FILES += Modules/AutoTranslate/AutoTranslate.x
+EXTRA_CFLAGS += -DENABLE_AUTO_TRANSLATE=1
+endif
+
 # Convenience: build everything
 ifeq ($(ENABLE_ALL_MODULES),1)
 MODULE_FILES += Modules/SleepTimer/SleepTimer.x
@@ -61,7 +71,9 @@ MODULE_FILES += Modules/GestureControls/GestureControls.x
 MODULE_FILES += Modules/ClipboardDetector/ClipboardDetector.x
 MODULE_FILES += Modules/AdBlock/AdBlock.x
 MODULE_FILES += Modules/OLEDTheme/OLEDTheme.x
-EXTRA_CFLAGS += -DENABLE_SLEEP_TIMER=1 -DENABLE_GESTURES=1 -DENABLE_CLIPBOARD=1 -DENABLE_ADBLOCK_PLUS=1 -DENABLE_OLED=1
+MODULE_FILES += Modules/AISummary/AISummary.x
+MODULE_FILES += Modules/AutoTranslate/AutoTranslate.x
+EXTRA_CFLAGS += -DENABLE_SLEEP_TIMER=1 -DENABLE_GESTURES=1 -DENABLE_CLIPBOARD=1 -DENABLE_ADBLOCK_PLUS=1 -DENABLE_OLED=1 -DENABLE_AI_SUMMARY=1 -DENABLE_AUTO_TRANSLATE=1
 endif
 
 # ──────────────────────────────────────────────

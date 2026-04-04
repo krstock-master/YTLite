@@ -367,6 +367,72 @@ static NSString *GetCacheSize() {
             [rows addObject:[self switchWithTitle:@"OLEDMode" key:@"oledMode"]];
 #endif
 
+#ifdef ENABLE_AI_SUMMARY
+            [rows addObject:[self switchWithTitle:@"AISummary" key:@"aiSummary"]];
+#endif
+
+#ifdef ENABLE_AUTO_TRANSLATE
+            [rows addObject:[self switchWithTitle:@"AutoTranslate" key:@"autoTranslate"]];
+#endif
+
+#if defined(ENABLE_AI_SUMMARY) || defined(ENABLE_AUTO_TRANSLATE)
+            // AI API Provider selector
+            [rows addObject:[YTSettingsSectionItemClass itemWithTitle:LOC(@"AIProvider")
+                accessibilityIdentifier:@"YTLiteSectionItem"
+                detailTextBlock:^NSString *() {
+                    NSArray *providers = @[@"Groq", @"OpenRouter", LOC(@"Custom")];
+                    return providers[ytlInt(@"aiProvider")];
+                }
+                selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
+                    NSMutableArray *providerRows = [NSMutableArray array];
+                    NSArray *providers = @[@"Groq (Free)", @"OpenRouter", LOC(@"Custom")];
+                    for (NSUInteger i = 0; i < providers.count; i++) {
+                        [providerRows addObject:[YTSettingsSectionItemClass checkmarkItemWithTitle:providers[i] titleDescription:nil selectBlock:^BOOL (YTSettingsCell *c, NSUInteger idx) {
+                            ytlSetInt((int)idx, @"aiProvider");
+                            [settingsViewController reloadData];
+                            return YES;
+                        }]];
+                    }
+                    YTSettingsPickerViewController *picker = [[%c(YTSettingsPickerViewController) alloc] initWithNavTitle:LOC(@"AIProvider") pickerSectionTitle:nil rows:providerRows selectedItemIndex:ytlInt(@"aiProvider") parentResponder:[self parentResponder]];
+                    [settingsViewController pushViewController:picker];
+                    return YES;
+                }]];
+
+            // API Key input
+            [rows addObject:[YTSettingsSectionItemClass itemWithTitle:LOC(@"AIApiKey")
+                accessibilityIdentifier:@"YTLiteSectionItem"
+                detailTextBlock:^NSString *() {
+                    NSString *key = [[YTLUserDefaults standardUserDefaults] objectForKey:@"aiApiKey"];
+                    if (!key || key.length == 0) return LOC(@"NotSet");
+                    // Mask the key: show first 4 and last 4 chars
+                    if (key.length > 8) {
+                        return [NSString stringWithFormat:@"%@...%@",
+                            [key substringToIndex:4],
+                            [key substringFromIndex:key.length - 4]];
+                    }
+                    return @"••••";
+                }
+                selectBlock:^BOOL (YTSettingsCell *cell, NSUInteger arg1) {
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:LOC(@"AIApiKey")
+                        message:LOC(@"AIApiKeyDesc")
+                        preferredStyle:UIAlertControllerStyleAlert];
+                    [alert addTextFieldWithConfigurationHandler:^(UITextField *tf) {
+                        tf.placeholder = @"gsk_... or sk-or-...";
+                        tf.text = [[YTLUserDefaults standardUserDefaults] objectForKey:@"aiApiKey"];
+                        tf.secureTextEntry = YES;
+                        tf.autocorrectionType = UITextAutocorrectionTypeNo;
+                    }];
+                    [alert addAction:[UIAlertAction actionWithTitle:LOC(@"Save") style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                        NSString *key = alert.textFields.firstObject.text;
+                        [[YTLUserDefaults standardUserDefaults] setObject:key forKey:@"aiApiKey"];
+                        [settingsViewController reloadData];
+                    }]];
+                    [alert addAction:[UIAlertAction actionWithTitle:LOC(@"Cancel") style:UIAlertActionStyleCancel handler:nil]];
+                    [[%c(YTUIUtils) topViewControllerForPresenting] presentViewController:alert animated:YES completion:nil];
+                    return YES;
+                }]];
+#endif
+
             if (rows.count == 0) {
                 [rows addObject:[%c(YTSettingsSectionItem) itemWithTitle:LOC(@"NoModulesEnabled") accessibilityIdentifier:@"YTLiteSectionItem" detailTextBlock:nil selectBlock:nil]];
             }

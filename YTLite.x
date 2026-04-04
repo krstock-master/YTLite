@@ -1318,27 +1318,81 @@ BOOL isTabSelected = NO;
 - (void)layoutSubviews {
     %orig;
 
-    if (ytlBool(@"copyVideoInfo") && [self.panelIdentifier.identifierString isEqualToString:@"video-description-ep-identifier"]) {
+    if (![self.panelIdentifier.identifierString isEqualToString:@"video-description-ep-identifier"]) return;
+    if (!self.headerView) return;
+
+    // Button trailing offset tracker (each button takes 40pt)
+    CGFloat __block nextOffset = -48;
+
+    // ── Copy Video Info button (original) ──
+    if (ytlBool(@"copyVideoInfo") && ![self.headerView viewWithTag:999]) {
         YTQTMButton *copyInfoButton = [%c(YTQTMButton) iconButton];
         copyInfoButton.accessibilityLabel = LOC(@"CopyVideoInfo");
         [copyInfoButton setTag:999];
         [copyInfoButton enableNewTouchFeedback];
         [copyInfoButton setImage:YTImageNamed(@"yt_outline_copy_24pt") forState:UIControlStateNormal];
         [copyInfoButton setTintColor:[UIColor labelColor]];
-        [copyInfoButton setTranslatesAutoresizingMaskIntoConstraints:false];
+        [copyInfoButton setTranslatesAutoresizingMaskIntoConstraints:NO];
         [copyInfoButton addTarget:self action:@selector(didTapCopyInfoButton:) forControlEvents:UIControlEventTouchUpInside];
 
-        if (self.headerView && ![self.headerView viewWithTag:999]) {
-            [self.headerView addSubview:copyInfoButton];
-
-            [NSLayoutConstraint activateConstraints:@[
-                [copyInfoButton.trailingAnchor constraintEqualToAnchor:self.headerView.trailingAnchor constant:-48],
-                [copyInfoButton.centerYAnchor constraintEqualToAnchor:self.headerView.centerYAnchor],
-                [copyInfoButton.widthAnchor constraintEqualToConstant:40.0],
-                [copyInfoButton.heightAnchor constraintEqualToConstant:40.0],
-            ]];
-        }
+        [self.headerView addSubview:copyInfoButton];
+        [NSLayoutConstraint activateConstraints:@[
+            [copyInfoButton.trailingAnchor constraintEqualToAnchor:self.headerView.trailingAnchor constant:nextOffset],
+            [copyInfoButton.centerYAnchor constraintEqualToAnchor:self.headerView.centerYAnchor],
+            [copyInfoButton.widthAnchor constraintEqualToConstant:40.0],
+            [copyInfoButton.heightAnchor constraintEqualToConstant:40.0],
+        ]];
+        nextOffset -= 40;
+    } else if ([self.headerView viewWithTag:999]) {
+        nextOffset -= 40;
     }
+
+#ifdef ENABLE_AI_SUMMARY
+    // ── AI Summary button (sparkles icon) ──
+    if (ytlBool(@"aiSummary") && ![self.headerView viewWithTag:8890]) {
+        YTQTMButton *aiButton = [%c(YTQTMButton) iconButton];
+        [aiButton setTag:8890];
+        aiButton.accessibilityLabel = LOC(@"AISummary");
+        [aiButton enableNewTouchFeedback];
+        [aiButton setImage:[UIImage systemImageNamed:@"sparkles"] forState:UIControlStateNormal];
+        [aiButton setTintColor:[UIColor colorWithRed:0.75 green:0.50 blue:0.90 alpha:1.0]];
+        [aiButton setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [aiButton addTarget:self action:@selector(ytl_didTapAISummary) forControlEvents:UIControlEventTouchUpInside];
+
+        [self.headerView addSubview:aiButton];
+        [NSLayoutConstraint activateConstraints:@[
+            [aiButton.trailingAnchor constraintEqualToAnchor:self.headerView.trailingAnchor constant:nextOffset],
+            [aiButton.centerYAnchor constraintEqualToAnchor:self.headerView.centerYAnchor],
+            [aiButton.widthAnchor constraintEqualToConstant:40.0],
+            [aiButton.heightAnchor constraintEqualToConstant:40.0],
+        ]];
+        nextOffset -= 40;
+    } else if ([self.headerView viewWithTag:8890]) {
+        nextOffset -= 40;
+    }
+#endif
+
+#ifdef ENABLE_AUTO_TRANSLATE
+    // ── Translate button (globe icon) ──
+    if (ytlBool(@"autoTranslate") && ![self.headerView viewWithTag:8891]) {
+        YTQTMButton *translateBtn = [%c(YTQTMButton) iconButton];
+        [translateBtn setTag:8891];
+        translateBtn.accessibilityLabel = LOC(@"Translate");
+        [translateBtn enableNewTouchFeedback];
+        [translateBtn setImage:[UIImage systemImageNamed:@"globe"] forState:UIControlStateNormal];
+        [translateBtn setTintColor:[UIColor systemBlueColor]];
+        [translateBtn setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [translateBtn addTarget:self action:@selector(ytl_didTapTranslateDesc) forControlEvents:UIControlEventTouchUpInside];
+
+        [self.headerView addSubview:translateBtn];
+        [NSLayoutConstraint activateConstraints:@[
+            [translateBtn.trailingAnchor constraintEqualToAnchor:self.headerView.trailingAnchor constant:nextOffset],
+            [translateBtn.centerYAnchor constraintEqualToAnchor:self.headerView.centerYAnchor],
+            [translateBtn.widthAnchor constraintEqualToConstant:40.0],
+            [translateBtn.heightAnchor constraintEqualToConstant:40.0],
+        ]];
+    }
+#endif
 }
 
 %new
@@ -1361,6 +1415,52 @@ BOOL isTabSelected = NO;
 
     [sheetController presentFromViewController:self.resizeDelegate animated:YES completion:nil];
 }
+
+#ifdef ENABLE_AI_SUMMARY
+%new
+- (void)ytl_didTapAISummary {
+    YTPlayerViewController *playerVC = self.resizeDelegate.parentViewController.parentViewController.parentViewController.playerViewController;
+    NSString *videoID = playerVC.contentVideoID;
+
+    Class mgrClass = NSClassFromString(@"YTLAISummaryManager");
+    if (mgrClass) {
+        [[mgrClass sharedInstance] summarizeVideoWithID:videoID fromController:self.resizeDelegate];
+    }
+}
+#endif
+
+#ifdef ENABLE_AUTO_TRANSLATE
+%new
+- (void)ytl_didTapTranslateDesc {
+    YTPlayerViewController *playerVC = self.resizeDelegate.parentViewController.parentViewController.parentViewController.playerViewController;
+    NSString *desc = playerVC.playerResponse.playerData.videoDetails.shortDescription;
+
+    if (!desc || desc.length == 0) {
+        [[%c(YTToastResponderEvent) eventWithMessage:LOC(@"TranslateNoText") firstResponder:self.resizeDelegate] send];
+        return;
+    }
+
+    [[%c(YTToastResponderEvent) eventWithMessage:LOC(@"Translating") firstResponder:self.resizeDelegate] send];
+
+    Class mgrClass = NSClassFromString(@"YTLTranslateManager");
+    if (mgrClass) {
+        [[mgrClass sharedInstance] translateText:desc completion:^(NSString *translated, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (error) {
+                    [[%c(YTToastResponderEvent) eventWithMessage:error.localizedDescription firstResponder:self.resizeDelegate] send];
+                    return;
+                }
+
+                YTAlertView *alert = [%c(YTAlertView) infoDialog];
+                alert.title = LOC(@"TranslatedDescription");
+                alert.subtitle = translated;
+                [alert show];
+            });
+        }];
+    }
+}
+#endif
+
 %end
 
 CGFloat rateBeforeSpeedmaster = 1.0;

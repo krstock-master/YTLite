@@ -772,3 +772,30 @@
 /* OLED 테마 모듈 */
 "OLEDMode" = "OLED 순수 블랙 모드";
 "OLEDModeDesc" = "다크 모드 활성화 시 모든 어두운 회색 배경을 순수 블랙으로 변환합니다. OLED 디스플레이에서 배터리를 절약합니다.";
+
+/* AI 영상 요약 모듈 */
+"AISummary" = "AI 영상 요약";
+"AISummaryDesc" = "영상 설명 패널에 ✨ 버튼을 추가합니다. 탭하면 AI가 영상 자막을 기반으로 요약을 생성합니다.";
+"AISummaryLoading" = "자막 가져오는 중 & 요약 생성 중...";
+"AISummaryNoKey" = "YTLite → Plus 기능에서 AI API 키를 설정하세요";
+"AISummaryNoTranscript" = "이 영상에 자막/스크립트가 없습니다";
+
+/* 자동 번역 모듈 */
+"AutoTranslate" = "자동 번역";
+"AutoTranslateDesc" = "영상 설명과 댓글 메뉴에 번역 버튼을 추가합니다. 설정된 AI API를 사용합니다.";
+"Translate" = "번역";
+"TranslateText" = "텍스트 번역";
+"TranslateNoText" = "번역할 텍스트가 없습니다";
+"TranslateNoKey" = "YTLite → Plus 기능에서 AI API 키를 설정하세요";
+"Translating" = "번역 중...";
+"TranslatedDescription" = "번역된 설명";
+"TranslatedComment" = "번역된 댓글";
+
+/* AI 설정 */
+"AIProvider" = "AI 제공자";
+"AIApiKey" = "API 키";
+"AIApiKeyDesc" = "API 키를 입력하세요 (Groq, OpenRouter 또는 커스텀). 키는 로컬에 저장되며 공유되지 않습니다.";
+"Custom" = "커스텀";
+"NotSet" = "설정되지 않음";
+"Save" = "저장";
+"Cancel" = "취소";
