@@ -1,145 +1,144 @@
-# YouTube Plus (ex. YTLite)
-A flexible enhancer for YouTube on iOS, featuring over hundred customizable options.
+# YouTube Plus (YTLite Fork) v4.0.0
 
-## Table of Contents
-- [Screenshots](#screenshots)
-- [Main Features](#main-features)
-- [FAQ](#faq)
-- [Reviews](#reviews)
-- [How to build a YouTube Plus app using GitHub Actions](#how-to-build-a-youtube-plus-app-using-github-actions)
-- [Supported YouTube Version](#supported-youtube-version)
-- [Tweak Integration Details](#tweak-integration-details)
+> The ultimate iOS YouTube client — surpassing both ReVanced (Android) and the original YouTube Plus.
 
-## Screenshots
-<table>
-   <tr>
-      <td><img src="Resources/scr1.jpg" alt="Screenshot 1" /></td>
-      <td><img src="Resources/scr2.jpg" alt="Screenshot 2" /></td>
-      <td><img src="Resources/scr3.jpg" alt="Screenshot 3" /></td>
-   </tr>
-</table>
+[![Build from Source](https://github.com/krstock-master/YTLite/actions/workflows/build_from_source.yml/badge.svg)](https://github.com/krstock-master/YTLite/actions/workflows/build_from_source.yml)
 
-<details>
-  <summary>More screenshots</summary>
-  <table>
-    <tr>
-      <td><img src="Resources/scr4.jpg" alt="Screenshot 4" /></td>
-      <td><img src="Resources/scr5.jpg" alt="Screenshot 5" /></td>
-      <td><img src="Resources/scr6.jpg" alt="Screenshot 6" /></td>
-    </tr>
-    <tr>
-      <td><img src="Resources/scr7.jpg" alt="Screenshot 7" /></td>
-      <td><img src="Resources/scr8.jpg" alt="Screenshot 8" /></td>
-      <td><img src="Resources/scr9.jpg" alt="Screenshot 9" /></td>
-    </tr>
-  </table>
-</details>
+## Features
 
-## Main Features
-<li>Download videos, audio (including audio track selection), thumbnails, posts, and profile pictures</li>
-<li>Copy video, comment, and post information</li>
-<li>Interface customization: Remove feed elements, reorder tabs, enable OLED mode, and as use Shorts-only mode</li>
-<li>Player settings: Gestures, default quality, preferred audio track</li>
-<li>Save, Load and Restore settings. Clear cache once or automatically on app startup</li>
-<li>Built-in SponsorBlock</li>
-<li>And much, much more</li>
-<br>
+### Core (Always Included)
+- **Ad removal** — Video ads, banners, sponsored cards, Premium popups
+- **Background playback** — Continue audio when app is minimized
+- **Custom playback speed** — 0.25× to 5× with long-press speedmaster
+- **Auto quality** — Per-network (WiFi/Cellular) quality presets
+- **Shorts control** — Hide, redirect to regular player, auto-skip, progress bar
+- **Tab management** — Hide/reorder tabs, Explore tab, startup tab selection
+- **Player overlay** — Hide autoplay, end cards, watermarks, fullscreen actions
+- **Comment/Post manager** — Copy text, save as image via long press
+- **Native share** — iOS share sheet instead of YouTube's built-in
+- **Sideloading support** — Full keychain/bundle ID patching
 
+### Optional Modules (Build-time Selection)
 
-**YouTube Plus preferences can be found in the YouTube Settings**
+| Module | Flag | Description |
+|--------|------|-------------|
+| **Enhanced Ad Block** | `ENABLE_ADBLOCK_PLUS=1` | 7-layer deep ad removal: server response stripping, renderer nullification, tracking prevention, Premium upsell blocking, Shorts ads, notification promos |
+| **Sleep Timer** | `ENABLE_SLEEP_TIMER=1` | 15/30/45/60/90/120 min timers, end-of-video pause, headphone disconnect auto-pause |
+| **Gesture Controls** | `ENABLE_GESTURES=1` | ReVanced-style volume/brightness swipe (right=volume, left=brightness) with pill HUD |
+| **Clipboard Detector** | `ENABLE_CLIPBOARD=1` | Auto-detect YouTube URLs in clipboard, prompt to open in-app |
+| **OLED Theme** | `ENABLE_OLED=1` | Pure black (#000000) dark mode for OLED battery savings |
+| **AI Summary** | `ENABLE_AI_SUMMARY=1` | Video transcript → LLM API → 3-5 bullet point summary (Groq/OpenRouter) |
+| **Auto-Translate** | `ENABLE_AUTO_TRANSLATE=1` | Translate descriptions and comments via AI API |
+| **Download Plus** | `ENABLE_DOWNLOAD_PLUS=1` | Subtitle export (.srt) with language fallback, playlist batch queue |
 
-**All contributors are listed in the Contributors section**
-**Used open-source libraries are listed in the Open Source Libraries section**
+## Building
 
-## FAQ
-- [🇺🇸 English FAQ](FAQs/FAQ_EN.md)
-- [🇷🇺 ЧаВо на Русском](FAQs/FAQ_RU.md)
-- [🇮🇹 FAQ in Italiano](FAQs/FAQ_IT.md)
-- [🇵🇱 FAQ po polsku](FAQs/FAQ_PL.md)
+### Prerequisites
+- macOS with Xcode Command Line Tools
+- [Theos](https://theos.dev) build system
+- `make`, `ldid`, `dpkg` (via Homebrew)
 
-## Reviews
-Review by [@qbap](https://github.com/qbap) on ONE Jailbreak: https://onejailbreak.com/blog/youtube-plus/
+### Build from Source
 
-## How to build a YouTube Plus app using Github actions
-> [!NOTE]
-> If this your first time, complete following steps before starting:
->
-> 1. Fork this repository using the fork button on the top right
-> 2. On your forked repository, go to **Repository Settings** > **Actions**, enable **Read and Write** permissions.
+```bash
+# Clone
+git clone https://github.com/krstock-master/YTLite.git
+cd YTLite
 
-<details>
-  <summary>How to build the YouTube Plus app</summary>
-  <ol>
-    <li>Click on <strong>Sync fork</strong>, and if your branch is out-of-date, click on <strong>Update branch</strong>.</li>
-    <li>Navigate to the <strong>Actions tab</strong> in your forked repository and select <strong>Create YouTube Plus app</strong>.</li>
-    <li>Click the <strong>Run workflow</strong> button located on the right side.</li>
-    <li>Mark or unmark the tweaks you want to integrate. Learn more about them in the <a href="#tweak-integration-details">Tweak Integration Details</a> section.</li>
-    <li>Prepare a decrypted .ipa file <em>(we cannot provide this due to legal reasons)</em>, then upload it to a file provider (e.g., filebin.net, filemail.com, or Dropbox is recommended). Paste the URL of the decrypted IPA file in the provided field.</li>
-    <li><strong>NOTE:</strong> Make sure to provide a direct download link to the file, not a link to a webpage. Otherwise, the process will fail.</li>
-    <li>Enter the tweak version from the releases (the latest release is selected by default). You can also change the BundleID and Display Name if desired.</li>
-    <li>Make sure all inputs are correct, then click <strong>Run workflow</strong> to start the process.</li>
-    <li>Wait for the build to finish. You can download the YouTube Plus app from the releases section of your forked repo. (If you can't find the releases section, go to your forked repo and add /releases to the URL, i.e., github.com/user/YTLite/releases.)</li>
-  </ol>
-</details>
+# Build with all modules
+make clean package ENABLE_ALL_MODULES=1
 
+# Build with specific modules only
+make clean package ENABLE_ADBLOCK_PLUS=1 ENABLE_OLED=1 ENABLE_SLEEP_TIMER=1
 
-<details>
-  <summary>How to build the YouTube Plus app with your own link for the YouTube Plus tweak</summary>
-  <ol>
-    <blockquote>
-      <p><strong>NOTE:</strong> This option is primarily intended for building the YouTube Plus app based on the beta file you have. In other cases, it is generally not needed.</p>
-    </blockquote>
-    <li>Click on <strong>Sync fork</strong>, and if your branch is out-of-date, click on <strong>Update branch</strong>.</li>
-    <li>Navigate to the <strong>Actions tab</strong> in your forked repository and select <strong>[BETA] Build YouTube Plus app</strong>.</li>
-    <li>Click the <strong>Run workflow</strong> button located on the right side.</li>
-    <li>Mark or unmark the tweaks you want to integrate. Learn more about them in the <a href="#tweak-integration-details">Tweak Integration Details</a> section.</li>
-    <li>Prepare a decrypted .ipa file <em>(we cannot provide this due to legal reasons)</em>, then upload it to a file provider (e.g., filebin.net, filemail.com, or Dropbox is recommended). Paste the URL of the decrypted IPA file in the provided field.</li>
-    <li>Upload your beta tweak file to a file provider and paste direct link to the <strong>URL to the YouTube Plus tweak file</strong> field. You can also change the BundleID and Display Name if desired.</li>
-    <li><strong>NOTE:</strong> Make sure to provide a direct download link to the file, not a link to a webpage. Otherwise, the process will fail.</li>
-    <li>Make sure all inputs are correct, then click <strong>Run workflow</strong> to start the process.</li>
-    <li>Wait for the build to finish. You can download the YouTube Plus app from the releases section of your forked repo. (If you can't find the releases section, go to your forked repo and add /releases to the URL, i.e., github.com/user/YTLite/releases.)</li>
-  </ol>
-</details>
+# Build core only (no extra modules)
+make clean package
+```
 
-## Supported YouTube Version
-<ul>
-   <li><strong>Latest confirmed:</strong> <em>20.42.3</em></li>
-   <li><strong>Date tested:</strong> <em>Nov 5, 2025</em></li>
-   <li><strong>YouTube Plus:</strong> <em>5.2 beta 4</em></li>
-</ul>
+### GitHub Actions (Recommended)
 
-## Tweak Integration Details
-<details>
-  <summary>YouPiP</summary>
-  <p>YouPiP is a tweak developed by <a href="https://github.com/PoomSmart">PoomSmart</a> that enables the native Picture-in-Picture feature for videos in the iOS YouTube app.</p>
-  <p><strong>YouPiP preferences</strong> are available in the <strong>YouTube settings</strong>.</p>
-  <p>Source code and additional information are available <a href="https://github.com/PoomSmart/YouPiP">in PoomSmart's GitHub repository</a>.</p>
-</details>
+1. Go to **Actions** → **Build YouTube Plus (from source)**
+2. Click **Run workflow**
+3. Provide a decrypted YouTube IPA URL
+4. Toggle desired modules on/off
+5. Download the built IPA from **Releases**
 
-<details>
-  <summary>YTUHD</summary>
-  <p>YTUHD is a tweak developed by <a href="https://github.com/PoomSmart">PoomSmart</a> that unlocks 1440p (2K) and 2160p (4K) resolutions in the iOS YouTube app.</p>
-  <p><strong>YTUHD preferences</strong> are available in the <strong>Video quality preferences</strong> section under <strong>YouTube settings</strong>.</p>
-  <p>Source code and additional information are available <a href="https://github.com/PoomSmart/YTUHD">in PoomSmart's GitHub repository</a>.</p>
-</details>
+## AI Features Setup
 
-<details>
-  <summary>Return YouTube Dislikes</summary>
-  <p>Return YouTube Dislikes is a tweak developed by <a href="https://github.com/PoomSmart">PoomSmart</a> that brings back dislikes on the YouTube app.</p>
-  <p><strong>Return YouTube Dislikes preferences</strong> are available in the <strong>YouTube settings</strong>.</p>
-  <p>Source code and additional information are available <a href="https://github.com/PoomSmart/Return-YouTube-Dislikes">in PoomSmart's GitHub repository</a>.</p>
-</details>
+The AI Summary and Auto-Translate modules require an API key:
 
-<details>
-  <summary>YouQuality</summary>
-  <p>YouQuality is a tweak developed by <a href="https://github.com/PoomSmart">PoomSmart</a> that allows to view and change video quality directly from the video overlay.</p>
-  <p><strong>YouQuality can be enabled</strong> in the <strong>Video overlay</strong> section under <strong>YouTube settings</strong>.</p>
-  <p>Source code and additional information are available <a href="https://github.com/PoomSmart/YouQuality">in PoomSmart's GitHub repository</a>.</p>
-</details>
+1. Get a free API key:
+   - **Groq**: [console.groq.com](https://console.groq.com) (free tier available)
+   - **OpenRouter**: [openrouter.ai](https://openrouter.ai) (free models available)
 
-<details>
-  <summary>DontEatMyContent</summary>
-  <p>DontEatMyContent is a tweak developed by <a href="https://github.com/therealFoxster">therealFoxster</a> that prevents the Notch/Dynamic Island from munching on 2:1 video content in the iOS YouTube app.</p>
-  <p><strong>DontEatMyContent preferences</strong> are available in the <strong>YouTube settings</strong>.</p>
-  <p>Source code and additional information are available <a href="https://github.com/therealFoxster/DontEatMyContent">in therealFoxster's GitHub repository</a>.</p>
-</details>
+2. In YouTube → Settings → **YTLite** → **Plus Features**:
+   - Select your **AI Provider**
+   - Enter your **API Key**
+   - Enable **AI Summary** and/or **Auto-Translate**
+
+3. Usage:
+   - **AI Summary**: Tap ✨ button in video description panel
+   - **Translate Description**: Tap 🌐 button in video description panel
+   - **Translate Comment**: Long-press comment → "Translate text"
+
+## Project Structure
+
+```
+YTLite/
+├── YTLite.x             # Core hooks (1500+ lines)
+├── Settings.x           # YouTube Settings integration
+├── Sideloading.x        # Bundle ID / keychain patching
+├── YTNativeShare.x      # Native iOS share sheet
+├── YTLite.h             # Shared header / interface declarations
+├── YouTubeHeaders.h     # YouTube internal class declarations
+├── Utils/               # NSBundle, Reachability, UserDefaults
+├── Modules/
+│   ├── AdBlock/         # Enhanced 7-layer ad removal
+│   ├── SleepTimer/      # Timer + headphone auto-pause
+│   ├── GestureControls/ # Volume/brightness swipe
+│   ├── ClipboardDetector/ # Clipboard URL detection
+│   ├── OLEDTheme/       # Pure black dark mode
+│   ├── AISummary/       # Video transcript summarization
+│   ├── AutoTranslate/   # Description/comment translation
+│   └── DownloadPlus/    # Subtitle export + playlist queue
+├── layout/              # Resources, localizations
+│   └── Library/Application Support/YTLite.bundle/
+│       ├── en.lproj/    # English
+│       ├── ko.lproj/    # Korean
+│       └── ...          # 12+ languages
+├── Makefile             # Module toggle build system
+├── control              # Debian package metadata
+└── .github/workflows/
+    ├── build_from_source.yml  # Full source build + module selection
+    ├── main.yml               # Legacy pre-built .deb workflow
+    └── _build_tweaks.yml      # Companion tweak builder
+```
+
+## Companion Tweaks
+
+These are built separately and injected alongside YouTube Plus:
+
+| Tweak | Purpose |
+|-------|---------|
+| [YouPiP](https://github.com/PoomSmart/YouPiP) | Picture-in-Picture |
+| [YTUHD](https://github.com/Tonwalter888/YTUHD) | 4K/HDR quality unlock |
+| [Return YouTube Dislikes](https://github.com/PoomSmart/Return-YouTube-Dislikes) | Dislike count restoration |
+| [YTABConfig](https://github.com/PoomSmart/YTABConfig) | A/B experiment flag control |
+| [YouQuality](https://github.com/PoomSmart/YouQuality) | Quality preferences |
+| [DontEatMyContent](https://github.com/therealFoxster/DontEatMyContent) | Dynamic Island safe area |
+
+## Credits
+
+- **[dayanch96](https://github.com/dayanch96)** — Original YTLite / YouTube Plus developer
+- **[PoomSmart](https://github.com/PoomSmart)** — YouTubeHeaders, YouTube-X, NoYTPremium, YouPiP, and many more
+- **[MiRO92](https://github.com/MiRO92)** — YTNoShorts
+- **[Tony Million](https://github.com/tonymillion)** — Reachability
+- **[jkhsjdhjs](https://github.com/jkhsjdhjs)** — YouTube Native Share
+
+## Disclaimer
+
+This project modifies a copyrighted application. It likely violates YouTube's Terms of Service. Use at your own risk and for personal/educational purposes only. The developers of this project are not responsible for any consequences arising from its use.
+
+## License
+
+This project is licensed under the [GPL-3.0 License](LICENSE).
